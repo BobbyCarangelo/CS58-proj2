@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "string.h": "c"
+        "string.h": "c",
+        "functional": "cpp",
+        "type_traits": "cpp",
+        "new": "cpp"
     }
 }

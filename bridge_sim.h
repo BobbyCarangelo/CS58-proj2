@@ -13,21 +13,28 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <stdbool.h>
+#include <unistd.h>
 #include <pthread.h>
 
+#define OPEN_BRIDGE 0
 #define TO_HANOVER 1
 #define TO_NORWICH 2 
+
+#define BRIDGE_SLEEP_TIME 5
 
 typedef struct shared_data_t
 {
     /*synchronization variables*/
-    pthread_mutex_t *lock;
-    pthread_cond_t *cv;
+    pthread_mutex_t lock;
+    pthread_cond_t wait_to_hanover;
+    pthread_cond_t wait_to_norwich;
 
     /*bridge data*/
-    int total;
+    int total_on_bridge;
     int direction;
+    int to_hanover_queued;
+    int to_norwich_queued;
 } shared_data_t;
 
 

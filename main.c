@@ -130,7 +130,7 @@ int main(void)
 
 		pthread_t thread_id = start_new_car_thread(direction, sd);
 
-		pthread_join(thread_id, NULL);
+		// pthread_join(thread_id, NULL);
 	}
 
 	sim_close(sd);
