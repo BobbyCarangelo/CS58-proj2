@@ -14,7 +14,6 @@
 
 void *car_thread(void *argp)
 {
-    printf("Simulating new vehicle\n");
     car_args_t *car_args = (car_args_t *) argp;
 
     int rc = OneVehicle(car_args);
@@ -26,7 +25,6 @@ void *car_thread(void *argp)
 
 int OneVehicle(car_args_t *car_args)
 {
-    printf("in one vehicle\n");
     ArriveBridge(car_args);
     OnBridge(car_args);
     ExitBridge(car_args);
@@ -43,7 +41,6 @@ void ArriveBridge(car_args_t *car_args)
         printf("acquire lock failure\n");
         exit(-1);
     }
-    printf("lock acquired\n");
 
     //add self to correct queue
     if (car_args->direction == TO_HANOVER)
@@ -67,7 +64,6 @@ void ArriveBridge(car_args_t *car_args)
             pthread_cond_wait(&car_args->sd->wait_to_norwich, &car_args->sd->lock);
         }  
     }
-    printf("done waiting\n");
 
     //now on bridge -> remove self from queue
     //add self to correct queue
@@ -219,9 +215,4 @@ void print_bridge(shared_data_t *sd)
     printf("    Queue cars going TO_NORWICH: %d\n", sd->to_norwich_queued);
 
     printf("\n**********************************\n\n");
-}
-
-void print_queue(void)
-{
-    printf("queue ???? \n");
 }

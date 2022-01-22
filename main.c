@@ -97,19 +97,41 @@ pthread_t start_new_car_thread(int direction, shared_data_t *sd)
 	return id;
 }
 
+void print_options(void)
+{
+	printf("Options:\n");
+	printf("	h: add car to sim going TO_HANOVER\n");
+	printf("	n: add car to sim going TO_NORWICH\n");
+	printf("	s 1: put this thread to sleep this loop for 1 second\n");
+	printf("	s 3: put this thread to sleep this loop for 3 seconds\n");
+	printf("	o: view options\n");
+	printf("	q: quit simulation\n");
+}
+
 int main(void)
 {
 	printf("Starting ledyard bridge simulation!\n");
 
 	bool done = false;
 	char *buffer = init_buffer(STRING_LEN);
-	int direction;
+	int direction, total_cars, count;
 
 	shared_data_t *sd = shared_data_init();
 
+	//get input of how many cars will be used in the simulation
+	do
+	{
+		input_string("How many total cars would you like to use for this simulation", buffer, STRING_LEN);
+		total_cars = atoi(buffer);
+		pthread_t thread_ids[total_cars];
+	} while (total_cars <= 0);
+	
+	pthread_t thread_ids[total_cars];
+
+	count = 0;
 	while (!done)
 	{
-		input_string("Add car to sim [h/n]", buffer, STRING_LEN);
+		input_string("Add car to sim [o for options]", buffer, STRING_LEN);
 
 		if (strcmp(buffer, "h") == 0)
 		{
@@ -122,15 +144,46 @@ int main(void)
 			done = true;
 			continue;
 		}
-		else
+		else if (strcmp(buffer, "s 1") == 0)
+		{
+			sleep(1);
+			continue;
+		}
+		else if (strcmp(buffer, "s 3") == 0)
+		{
+			sleep(3);
+			continue;
+		}
+		else if (strcmp(buffer, "o") == 0)
+		{
+			print_options();
+			continue;
+		}
+		else if (strcmp(buffer, "n") == 0)
 		{
 			printf("Adding car to norwich\n");
 			direction = TO_NORWICH;
 		}
+		else
+		{
+			printf("invalid keypress, type o for options\n");
+			continue;
+		}
 
-		pthread_t thread_id = start_new_car_thread(direction, sd);
+		thread_ids[count] = start_new_car_thread(direction, sd);
+		
+		count++;
+		if (count >= total_cars)
+		{
+			done = true;
+		}
 
-		// pthread_join(thread_id, NULL);
+		printf("Cars left to add to simulation: %d\n", total_cars - count);
+	}
+
+	for (int i = 0; i < count; i++)
+	{
+		pthread_join(thread_ids[i], NULL);
 	}
 
 	sim_close(sd);
