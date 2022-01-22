@@ -21,22 +21,59 @@
 #define STRING_LEN 32
 
 
+// // prompt the user with message, and save input at buffer
+// // (which should have space for at least len bytes)
+// int input_string(char *message, char *buffer, int len) {
+
+//   int rc = 0, fetched, lastchar;
+
+//   if (NULL == buffer)
+//     return -1;
+
+//   if (message)
+//     printf("%s: ", message);
+
+//   // get the string.  fgets takes in at most 1 character less than
+//   // the second parameter, in order to leave room for the terminating null.  
+//   // See the man page for fgets.
+//   fgets(buffer, len, stdin);
+  
+//   fetched = strlen(buffer);
+
+
+//   // warn the user if we may have left extra chars
+//   if ( (fetched + 1) >= len) {
+//     fprintf(stderr, "warning: might have left extra chars on input\n");
+//     rc = -1;
+//   }
+
+//   // consume a trailing newline
+//   if (fetched) {
+//     lastchar = fetched - 1;
+//     if ('\n' == buffer[lastchar])
+//       buffer[lastchar] = '\0';
+//   }
+
+//   return rc;
+// }
+
+
 // prompt the user with message, and save input at buffer
 // (which should have space for at least len bytes)
-int input_string(char *message, char *buffer, int len) {
+int input_string(char *message, char *buffer, int len, FILE *ifile) {
 
   int rc = 0, fetched, lastchar;
 
   if (NULL == buffer)
     return -1;
 
-  if (message)
+  if (message && (ifile == stdin))
     printf("%s: ", message);
 
   // get the string.  fgets takes in at most 1 character less than
   // the second parameter, in order to leave room for the terminating null.  
   // See the man page for fgets.
-  fgets(buffer, len, stdin);
+  fgets(buffer, len, ifile);
   
   fetched = strlen(buffer);
 
@@ -108,8 +145,30 @@ void print_options(void)
 	printf("	q: quit simulation\n");
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	if (argc != 2)
+	{
+		printf("main [mode]\n");
+		return -1;
+	}
+
+	FILE *input;
+
+	if (strcmp(argv[1], "k") == 0)
+	{
+		input = stdin;
+	}
+	else if (strcmp(argv[1], "f") == 0)
+	{
+		input = fopen("sim_input", "r");
+	}
+	else
+	{
+		printf("main [k/f]\n");
+		return -1;
+	}
+
 	printf("Starting ledyard bridge simulation!\n");
 
 	bool done = false;
@@ -121,7 +180,7 @@ int main(void)
 	//get input of how many cars will be used in the simulation
 	do
 	{
-		input_string("How many total cars would you like to use for this simulation", buffer, STRING_LEN);
+		input_string("How many total cars would you like to use for this simulation", buffer, STRING_LEN, input);
 		total_cars = atoi(buffer);
 		pthread_t thread_ids[total_cars];
 	} while (total_cars <= 0);
@@ -131,11 +190,11 @@ int main(void)
 	count = 0;
 	while (!done)
 	{
-		input_string("Add car to sim [o for options]", buffer, STRING_LEN);
+		input_string("Add car to sim [o for options]", buffer, STRING_LEN, input);
 
 		if (strcmp(buffer, "h") == 0)
 		{
-			printf("Adding car to hanover\n");
+			//printf("Adding car to hanover\n");
 			direction = TO_HANOVER;
 		}
 		else if (strcmp(buffer, "q") == 0)
@@ -161,7 +220,7 @@ int main(void)
 		}
 		else if (strcmp(buffer, "n") == 0)
 		{
-			printf("Adding car to norwich\n");
+			//printf("Adding car to norwich\n");
 			direction = TO_NORWICH;
 		}
 		else
@@ -178,12 +237,18 @@ int main(void)
 			done = true;
 		}
 
-		printf("Cars left to add to simulation: %d\n", total_cars - count);
+		//printf("Cars left to add to simulation: %d\n", total_cars - count);
 	}
 
 	for (int i = 0; i < count; i++)
 	{
+		//printf("cars clearing bridge ...\n");
 		pthread_join(thread_ids[i], NULL);
+	}
+
+	if (strcmp(argv[1], "f") == 0)
+	{
+		fclose(input);
 	}
 
 	sim_close(sd);
