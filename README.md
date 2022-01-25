@@ -32,10 +32,3 @@ Each car is represented by its own thread. The threads synchronize themselves wi
 ### Testing
 
 See testing.md in ./test_files
-
-
-### To do: 
-  -do grad level stuff  
-  -write test file scenarios  
-  -comments
-  -finish readme.md and testing.md
