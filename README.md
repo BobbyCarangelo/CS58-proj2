@@ -10,7 +10,7 @@ This program simulates safe travel across Ledyard Bridge while it is under const
 Compile the program by typing "make" into a terminal window in this directory. Run the program by typing "main [mode]". The two valid modes are:
 "k" to input from the keyboard, and "f" to input from a file. If you choose to input from the keyboard, you will first be prompted for the total amount of cars you would like to use in the simulation. Then you will be prompted for input to add cars to the simulation. Type "h" to add a car going to Hanover and type "n" to add a car going to Norwich. Type "o" to view all options. If you choose to input from a file, the file input must be contained in the file "sim_input" and must be structured as follows:  
 
-n (number of cars to be used in simulation)
+n (number of cars to be used in simulation)  
 h  
 n  
   
@@ -27,7 +27,11 @@ See the current sim_input or the test files for examples. Other options beside "
 
 ### Concurrency and Synchronization
 
-Each car is represented by its own thread. The threads synchronize themselves with a single, heap allocated instance of a shared data structure called shared_data_t (defined in bridge_sim.h). When a car wants to get on the bridge it goes through the following steps:  
+Each car is represented by its own thread. The threads synchronize themselves with a single, heap allocated instance of a shared data structure called shared_data_t (defined in bridge_sim.h). When a car wants to get on the bridge waits until the safe conditions are met. Once it is one the bridge the thread prints the state of the bridge and then sleeps for 5 seconds. When the car leaves the bridge the thread removes itself from the shared data counts and signals the appropriate condition variables that it may now be safe to cross the bridge.
+
+### Testing
+
+See testing.md in ./test_files
 
 
 ### To do: 
